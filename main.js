@@ -16,7 +16,7 @@ let signer;
 let gameContract;
 
 window.onload = function() {
-    newgame();
+    // 页面加载时不再自动开始游戏
 };
 
 
@@ -26,6 +26,10 @@ async function initEthereum() {
         provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner(); // 获取签名者
         gameContract = new ethers.Contract(contractAddress, abi, signer);
+
+        // 检查网络
+        const network = await provider.getNetwork();
+        console.log("Connected to network:", network);
     } else {
         alert("请安装 MetaMask!");
     }
@@ -36,14 +40,23 @@ async function newgame() {
     try {
         // 初始化棋盘格
         init();
-        // 调用智能合约的 startGame 函数
-        await initEthereum();
-        await gameContract.startGame(); 
         // 在随机两个格子生成数字
         generateOneNumber();
         generateOneNumber();
     } catch (error) {
         console.error("Error starting new game:", error);
+    }
+}
+
+// 开始游戏并上链
+async function startGame() {
+    console.log("startGame");
+    try {
+        await initEthereum();
+        await gameContract.startGame(); // 调用智能合约的 startGame 函数
+        newgame(); // 初始化游戏
+    } catch (error) {
+        console.error("Error starting game on blockchain:", error);
     }
 }
 
@@ -137,14 +150,37 @@ async function updateGame() {
     const score = calculateScore();
     // 获取当前棋盘状态
     const boards = getBoard();
+    
+    // 添加日志打印
+    console.log("准备上链的数据：");
+    console.log("分数：", score);
+    console.log("棋盘状态：", JSON.stringify(boards, null, 2));
+    
     // 调用智能合约的 updateGame 函数
-    await gameContract.updateGame(score, boards);
+    try {
+        const tx = await gameContract.updateGame(score, boards);
+        console.log("上链交易详情：", tx);
+        await tx.wait(); // 等待交易确认
+        console.log("数据上链成功！");
+    } catch (error) {
+        console.error("数据上链失败：", error);
+    }
 }
 
 // 获取游戏状态
 async function getGameState() {
-    const [score, board] = await gameContract.getGameState(); // 调用智能合约的 getGameState 函数
-    // 更新前端显示...
+    try {
+        console.log("正在从链上获取游戏状态...");
+        const [score, board] = await gameContract.getGameState();
+        console.log("链上游戏状态：");
+        console.log("分数：", score.toString());
+        console.log("棋盘：", JSON.stringify(board, null, 2));
+        // 更新前端显示...
+        return [score, board];
+    } catch (error) {
+        console.error("获取链上游戏状态失败：", error);
+        return null;
+    }
 }
 
 // 计算当前游戏得分
@@ -184,34 +220,50 @@ function getBoard() {
 
 document.getElementById('newgamebutton').addEventListener('click', async function(event) {
     event.preventDefault();
-    await newgame();
+    await startGame(); // 点击按钮时调用 startGame
 });
 
 // 键盘事件监听
-$(document).keydown(function (event) {
+$(document).keydown(async function (event) {
     switch (event.keyCode) {
         case 37://left
             if (moveLeft()) {
-                setTimeout(generateOneNumber(), 210);
-                setTimeout(isgameover(), 300);
+                setTimeout(generateOneNumber, 210);
+                setTimeout(isgameover, 300);
+                // 移动完成后上链
+                setTimeout(async () => {
+                    await updateGame();
+                }, 350);
             }
             break;
         case 38://up
             if (moveUp()) {
-                setTimeout(generateOneNumber(), 210);
-                setTimeout(isgameover(), 300);
+                setTimeout(generateOneNumber, 210);
+                setTimeout(isgameover, 300);
+                // 移动完成后上链
+                setTimeout(async () => {
+                    await updateGame();
+                }, 350);
             }
             break;
         case 39://right
             if (moveRight()) {
-                setTimeout(generateOneNumber(), 210);
-                setTimeout(isgameover(), 300);
+                setTimeout(generateOneNumber, 210);
+                setTimeout(isgameover, 300);
+                // 移动完成后上链
+                setTimeout(async () => {
+                    await updateGame();
+                }, 350);
             }
             break;
         case 40://down
             if (moveDown()) {
-                setTimeout(generateOneNumber(), 210);
-                setTimeout(isgameover(), 300);
+                setTimeout(generateOneNumber, 210);
+                setTimeout(isgameover, 300);
+                // 移动完成后上链
+                setTimeout(async () => {
+                    await updateGame();
+                }, 350);
             }
             break;
         default :
@@ -220,9 +272,7 @@ $(document).keydown(function (event) {
 });
 
 function moveLeft() {
-    console.log("Attempting to move left");
     if (!canMoveLeft(board)) {
-        console.log("Cannot move left");
         return false;
     }
     //moveLeft
@@ -255,9 +305,7 @@ function moveLeft() {
             }
         }
     }
-
     setTimeout(updateBoardView, 200);
-    console.log("Moved left");
     return true;
 }
 
@@ -392,3 +440,25 @@ function gameover() {
     gameover.css("height", "500px");
     gameover.css("background-color", "rgba(0, 0, 0, 0.5)");
 }
+
+// 查询链上游戏状态
+async function checkGameState() {
+    try {
+        console.log("正在从链上获取游戏状态...");
+        const [score, board] = await gameContract.getGameState();
+        console.log("链上游戏状态：");
+        console.log("分数：", score.toString());
+        console.log("棋盘：", JSON.stringify(board, null, 2));
+    } catch (error) {
+        console.error("获取链上游戏状态失败：", error);
+        console.error("合约地址：", contractAddress);
+        console.error("ABI：", JSON.stringify(abi, null, 2));
+        console.error("网络：", provider.network); // 输出网络信息
+    }
+}
+
+// 事件监听器
+document.getElementById('checkstatebutton').addEventListener('click', async function(event) {
+    event.preventDefault();
+    await checkGameState(); // 点击按钮时调用 checkGameState
+});
