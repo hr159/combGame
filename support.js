@@ -53,6 +53,49 @@ function getNumberBackgroundColor(number) {
             break;
     }
 }
+function getNumberBackgroundImage(number) {
+    switch (number) {
+        case 2:
+            return "static/1.jpg";
+            break;
+        case 4:
+            return "static/2.jpg";
+            break;
+        case 8:
+            return "static/3.jpg";
+            break;
+        case 16:
+            return "static/4.jpg";
+            break;
+        case 32:
+            return "static/5.jpg";
+            break;
+        case 64:
+            return "static/6.jpg";
+            break;
+        case 128:
+            return "static/7.jpg";
+            break;
+        case 256:
+            return "static/8.jpg";
+            break;
+        case 512:
+            return "static/9.jpg";
+            break;
+        case 1024:
+            return "static/10.jpg";
+            break;
+        case 2048:
+            return "static/11.jpg";
+            break;
+        case 4096:
+            return "static/12.jpg";
+            break;
+        case 8192:
+            return "static/13.jpg";
+            break;
+    }
+}
 
 function getNumberColor(number) {
     if (number <= 4) {
