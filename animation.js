@@ -5,8 +5,10 @@ function ShowNumberWithAnimation(i, j, randNumber) {
     var numberCell = $("#number-cell-" + i + "-" + j);
 
     numberCell.css("background-color", getNumberBackgroundColor(randNumber));
+    numberCell.css("background-image", 'url('+getNumberBackgroundImage(randNumber)+')');
+
     numberCell.css("color", getNumberColor(randNumber));
-    numberCell.text(randNumber);
+//    numberCell.text(randNumber);
 
     numberCell.animate({
         width: "100px",
