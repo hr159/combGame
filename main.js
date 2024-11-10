@@ -65,7 +65,7 @@ function updateBoardView() {
                 numberCell.css("background-color", getNumberBackgroundColor(board[i][j]));
                 numberCell.css("background-image", 'url('+getNumberBackgroundImage(board[i][j])+')');
                 numberCell.css("color", getNumberColor(board[i][j]));
-                // numberCell.text(board[i][j]);
+                numberCell.text(board[i][j]);
             }
 
             hasConflicted[i][j] = false;
