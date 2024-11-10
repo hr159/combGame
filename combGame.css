@@ -1,17 +1,17 @@
-header {
+#head {
     display: block;
     margin: 0 auto;
     width: 500px;
     text-align: center;
 }
 
-header h1 {
+#head h1 {
     font-family: Arial;
     font-size: 40px;
     font-weight: bold;
 }
 
-header #newgamebutton {
+#head #newgamebutton {
     display: block;
     margin: 20px auto;
 
@@ -27,14 +27,19 @@ header #newgamebutton {
     text-decoration: none;
 }
 
-header #newgamebutton:hover {
+#head #newgamebutton:hover {
     background-color: #9f8b77;
 }
 
-header p {
+#head p {
     font-family: Arial;
     font-size: 25px;
     margin: 20px auto;
+}
+#main{
+    background-image: url("static/bg.png");
+    background-repeat: repeat-x;
+    background-size: 100% 100%;
 }
 
 #grid-container {
