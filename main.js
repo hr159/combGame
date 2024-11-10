@@ -5,7 +5,7 @@ import config from './config.js'; // 导入配置文件
 var board = new Array(); // 全局变量
 var hasConflicted = new Array();
 var score = 0;
-
+var isTransactionPending = false; // 用于跟踪交易状态
 
 // 智能合约地址和 ABI
 const contractAddress = config.contractAddress; // 使用配置文件中的合约地址
@@ -50,6 +50,10 @@ async function newgame() {
 
 // 开始游戏并上链
 async function startGame() {
+    if (isTransactionPending) {
+        alert("交易进行中，请等待当前移动完成"); // 改为弹窗提示
+        return; // 如果有未完成的交易，阻止移动
+    }
     console.log("startGame");
     try {
         await initEthereum();
@@ -147,24 +151,26 @@ function generateOneNumber() {
 
 // 更新游戏状态
 async function updateGame() {
-    // 计算当前分数
     const score = calculateScore();
-    // 获取当前棋盘状态
     const boards = getBoard();
-    
-    // 添加日志打印
+
     console.log("准备上链的数据：");
     console.log("分数：", score);
     console.log("棋盘状态：", JSON.stringify(boards, null, 2));
-    
-    // 调用智能合约的 updateGame 函数
+
     try {
+        isTransactionPending = true; // 标记交易开始
         const tx = await gameContract.updateGame(score, boards);
         console.log("上链交易详情：", tx);
-        await tx.wait(); // 等待交易确认
+
+        // 等待交易确认后更新界面
+        await waitForTransaction(tx);
         console.log("数据上链成功！");
+        updateBoardView(); // 更新界面
     } catch (error) {
         console.error("数据上链失败：", error);
+    } finally {
+        isTransactionPending = false; // 标记交易结束
     }
 }
 
@@ -226,6 +232,11 @@ document.getElementById('newgamebutton').addEventListener('click', async functio
 
 // 键盘事件监听
 $(document).keydown(async function (event) {
+    if (isTransactionPending) {
+        alert("交易进行中，请等待当前移动完成"); // 改为弹窗提示
+        return; // 如果有未完成的交易，阻止移动
+    }
+
     switch (event.keyCode) {
         case 37://left
             if (moveLeft()) {
@@ -463,3 +474,13 @@ document.getElementById('checkstatebutton').addEventListener('click', async func
     event.preventDefault();
     await checkGameState(); // 点击按钮时调用 checkGameState
 });
+
+async function waitForTransaction(tx) {
+    try {
+        console.log("等待交易确认...");
+        await tx.wait(); // 等待交易确认
+        console.log("交易已确认！");
+    } catch (error) {
+        console.error("交易确认失败：", error);
+    }
+}
