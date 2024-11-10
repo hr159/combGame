@@ -202,11 +202,6 @@ function calculateScore() {
 
 // 在适当的地方调用 updateGame 和 getGameState 函数
 
-// 在合并数字时更新分数
-function updateScore(value) {
-    score += value;
-    $("#score").text(score);
-}
 
 // 在合并数字的地方调用
 // 例如：当两个数字合并时
