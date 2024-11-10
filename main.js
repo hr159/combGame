@@ -56,11 +56,14 @@ async function startGame() {
     }
     console.log("startGame");
     try {
+        isTransactionPending = true; // 标记交易开始
         await initEthereum();
         await gameContract.startGame(); // 调用智能合约的 startGame 函数
         newgame(); // 初始化游戏
     } catch (error) {
         console.error("Error starting game on blockchain:", error);
+    } finally {
+        isTransactionPending = false; // 标记交易结束
     }
 }
 
