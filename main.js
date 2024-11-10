@@ -51,7 +51,7 @@ async function newgame() {
 // 开始游戏并上链
 async function startGame() {
     if (isTransactionPending) {
-        alert("交易进行中，请等待当前移动完成"); // 改为弹窗提示
+        alert("游戏启动中，请等待上链操作后开始游戏"); // 改为弹窗提示
         return; // 如果有未完成的交易，阻止移动
     }
     console.log("startGame");
@@ -236,7 +236,7 @@ document.getElementById('newgamebutton').addEventListener('click', async functio
 // 键盘事件监听
 $(document).keydown(async function (event) {
     if (isTransactionPending) {
-        alert("交易进行中，请等待当前移动完成"); // 改为弹窗提示
+        alert("操作进行中，请等待上链后再操作"); // 改为弹窗提示
         return; // 如果有未完成的交易，阻止移动
     }
 
@@ -300,7 +300,7 @@ function moveLeft() {
                         showMoveAnimation(i, j, i, k);
                         board[i][k] = board[i][j];
                         board[i][j] = 0;
-
+                        // playMoveSound(); // 播放滑动音效
                         continue;
                     } else if (board[i][k] == board[i][j] && noBlokHorizontalCol(i, k, j, board) && !hasConflicted[i][k]) {
                         //move
@@ -308,6 +308,7 @@ function moveLeft() {
                         //add
                         board[i][k] += board[i][j];
                         board[i][j] = 0;
+                        // playMergeSound(); // 播放合并音效
 
                         //add score
                         score += board[i][k];
@@ -338,6 +339,7 @@ function moveRight() {
                         showMoveAnimation(i, j, i, k);
                         board[i][k] = board[i][j];
                         board[i][j] = 0;
+                        // playMoveSound(); // 播放滑动音效
 
                         continue;
                     } else if (board[i][k] == board[i][j] && noBlokHorizontalCol(i, j, k, board) && !hasConflicted[i][k]) {
@@ -346,6 +348,7 @@ function moveRight() {
                         //add
                         board[i][k] += board[i][j];
                         board[i][j] = 0;
+                        // playMergeSound(); // 播放合并音效
 
                         //add score
                         score += board[i][k];
@@ -377,6 +380,7 @@ function moveUp() {
                         showMoveAnimation(i, j, k, j);
                         board[k][j] = board[i][j];
                         board[i][j] = 0;
+                        // playMoveSound(); // 播放滑动音效
 
                         continue;
                     } else if (board[k][j] == board[i][j] && noBlokHorizontalRow(k, i, j, board) && !hasConflicted[k][j]) {
@@ -385,6 +389,7 @@ function moveUp() {
                         //add
                         board[k][j] += board[i][j];
                         board[i][j] = 0;
+                        // playMergeSound(); // 播放合并音效
 
                         //add score
                         score += board[k][j];
@@ -416,7 +421,7 @@ function moveDown() {
                         showMoveAnimation(i, j, k, j);
                         board[k][j] = board[i][j];
                         board[i][j] = 0;
-
+                        // playMoveSound(); // 播放滑动音效
                         continue;
                     } else if (board[k][j] == board[i][j] && noBlokHorizontalRow(i, k, j, board) && !hasConflicted[k][j]) {
                         //move
@@ -424,7 +429,7 @@ function moveDown() {
                         //add
                         board[k][j] += board[i][j];
                         board[i][j] = 0;
-
+                        // playMergeSound(); // 播放合并音效
                         //add score
                         score += board[k][j];
                         updateScore(score);
