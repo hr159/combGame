@@ -5,6 +5,8 @@ import config from './config.js'; // 导入配置文件
 var board = new Array(); // 全局变量
 var hasConflicted = new Array();
 var score = 0;
+var num = 0;//操作次数
+var tx = null;//交易
 var isTransactionPending = false; // 用于跟踪交易状态
 
 // 智能合约地址和 ABI
@@ -154,27 +156,45 @@ function generateOneNumber() {
 
 // 更新游戏状态
 async function updateGame() {
+    //第一次移动的时候直接上链，后续移动过程根据上一次得到返回值决定要不要上链
     const score = calculateScore();
     const boards = getBoard();
 
     console.log("准备上链的数据：");
     console.log("分数：", score);
     console.log("棋盘状态：", JSON.stringify(boards, null, 2));
-
-    try {
-        isTransactionPending = true; // 标记交易开始
-        const tx = await gameContract.updateGame(score, boards);
-        console.log("上链交易详情：", tx);
-
-        // 等待交易确认后更新界面
-        await waitForTransaction(tx);
-        console.log("数据上链成功！");
-        updateBoardView(); // 更新界面
-    } catch (error) {
-        console.error("数据上链失败：", error);
-    } finally {
-        isTransactionPending = false; // 标记交易结束
+    console.log("移动次数",num)
+    if(num==0){
+        try {
+            num=num+1;
+            //isTransactionPending = true; // 标记交易开始
+            tx = await gameContract.updateGame(score, boards);
+            console.log("上链交易详情：", tx);
+            // 等待交易确认后更新界面
+            await waitForTransaction(tx);
+            console.log("数据上链成功！");
+            updateBoardView(); // 更新界面
+        } catch (error) {
+            console.error("数据上链失败：", error);
+        } finally {
+            //isTransactionPending = false; // 标记交易结束
+        }
     }
+    else{
+        if(tx!=null){
+            tx ==null;
+            tx = await gameContract.updateGame(score, boards);
+            console.log("tx是",tx)
+            updateBoardView(); // 更新界面
+        }
+        else{
+            console.log("当前未获取到")
+            console.log("交易",tx);
+        }
+        num=num+1;
+
+    }
+
 }
 
 // 获取游戏状态
@@ -230,10 +250,10 @@ document.getElementById('newgamebutton').addEventListener('click', async functio
 
 // 键盘事件监听
 $(document).keydown(async function (event) {
-    if (isTransactionPending) {
-        alert("操作进行中，请等待上链后再操作"); // 改为弹窗提示
-        return; // 如果有未完成的交易，阻止移动
-    }
+//    if (isTransactionPending) {
+//        alert("操作进行中，请等待上链后再操作"); // 改为弹窗提示
+//        return; // 如果有未完成的交易，阻止移动
+//    }
 
     switch (event.keyCode) {
         case 37://left
