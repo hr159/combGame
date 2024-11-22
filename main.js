@@ -51,12 +51,22 @@ async function newgame() {
 async function startGame() {
     console.log("startGame");
     try {
-        const entryFee = ethers.parseEther("1"); // 将入场费写死为 1 ETH
+        const entryFee = ethers.parseEther(config.entryFee);
         const tx = await gameContract.startGame({ value: entryFee });
         await waitForTransaction(tx);
         newgame(); // 初始化游戏
     } catch (error) {
         console.error("Error starting game on blockchain:", error);
+        // 提取错误信息并显示给用户
+        let errorMessage = "游戏启动失败";
+        if (error.reason) {
+            // 如果是智能合约的错误信息
+            errorMessage = error.reason || "游戏启动失败，请检查您的钱包设置";
+        } else if (error.message) {
+            // 如果是其他类型的错误
+            errorMessage = error.message;
+        }
+        alert(errorMessage);
     }
 }
 
@@ -124,7 +134,7 @@ function generateOneNumber() {
     if (nospace(board)) {
         return false;
     }
-    //随机一个位置
+    //随机一位置
     var randx = parseInt(Math.floor(Math.random() * 4));
     var randy = parseInt(Math.floor(Math.random() * 4));
     while (true) {
@@ -145,7 +155,8 @@ function generateOneNumber() {
     return true;
 }
 
-// 更新游戏状态
+
+// 修改 updateGame 函数
 async function updateGame() {
     const score = calculateScore();
     const boards = getBoard();
@@ -155,18 +166,25 @@ async function updateGame() {
     console.log("棋盘状态：", JSON.stringify(boards, null, 2));
 
     try {
-        // isTransactionPending = true;
         const tx = await gameContract.updateGame(score, boards);
         console.log("上链交易详情：", tx);
 
-        // 等待交易确认后更新界面
         await waitForTransaction(tx);
         console.log("数据上链成功！");
-        updateBoardView(); // 更新界面
+        updateBoardView();
     } catch (error) {
         console.error("数据上链失败：", error);
-    } finally {
-        // isTransactionPending = false;
+        // 提取错误信息并显示给用户
+        let errorMessage = "数据上链失败";
+        if (error.reason) {
+            // 如果是智能合约的错误信息
+            errorMessage = error.reason || "数据上链失败，请检查您的钱包设置";
+        } else if (error.message) {
+            // 如果是其他类型的错误
+            errorMessage = error.message;
+        }
+        alert(errorMessage);
+        throw error; // 继续抛出错误以便调用者处理
     }
 }
 
@@ -223,57 +241,60 @@ document.getElementById('newgamebutton').addEventListener('click', async functio
     event.preventDefault();
     await startGame(); // 点击按钮时调用 startGame
 });
+// 添加计步器
+var moveCount = 0;
+var isUploading = false;
 
-// 键盘事件监听
+// 修改键盘事件监听器
 $(document).keydown(async function (event) {
-    // if (isTransactionPending) {
-    //     alert("操作进行中，请等待上链后再操作"); // 改为弹窗提示
-    //     return; // 如果有未完成的交易，阻止移动
-    // }
+    if (isUploading) {
+        alert("正在上链中，请等待...");
+        return;
+    }
 
+    let moved = false;
     switch (event.keyCode) {
         case 37://left
             if (moveLeft()) {
-                setTimeout(generateOneNumber, 210);
-                setTimeout(isgameover, 300);
-                // 移动完成后上链
-                setTimeout(async () => {
-                    await updateGame();
-                }, 350);
+                moved = true;
             }
             break;
         case 38://up
             if (moveUp()) {
-                setTimeout(generateOneNumber, 210);
-                setTimeout(isgameover, 300);
-                // 移动完成后上链
-                setTimeout(async () => {
-                    await updateGame();
-                }, 350);
+                moved = true;
             }
             break;
         case 39://right
             if (moveRight()) {
-                setTimeout(generateOneNumber, 210);
-                setTimeout(isgameover, 300);
-                // 移动完成后上链
-                setTimeout(async () => {
-                    await updateGame();
-                }, 350);
+                moved = true;
             }
             break;
         case 40://down
             if (moveDown()) {
-                setTimeout(generateOneNumber, 210);
-                setTimeout(isgameover, 300);
-                // 移动完成后上链
-                setTimeout(async () => {
-                    await updateGame();
-                }, 350);
+                moved = true;
             }
             break;
-        default :
+        default:
             break;
+    }
+
+    if (moved) {
+        moveCount++;
+        console.log("移动次数：", moveCount);
+        
+        setTimeout(generateOneNumber, 210);
+        setTimeout(isgameover, 300);
+
+        // 使用配置中的步数阈值
+        if (moveCount >= config.moveCountThreshold) {
+            isUploading = true;
+            try {
+                await updateGame();
+                moveCount = 0; // 重置计步器
+            } finally {
+                isUploading = false;
+            }
+        }
     }
 });
 
@@ -460,11 +481,19 @@ async function checkGameState() {
         console.log("链上游戏状态：");
         console.log("分数：", score.toString());
         console.log("棋盘：", JSON.stringify(board, null, 2));
+        alert(`当前游戏状态：\n分数：${score}\n棋盘：${JSON.stringify(board, null, 2)}`);
     } catch (error) {
         console.error("获取链上游戏状态失败：", error);
-        console.error("合约地址：", contractAddress);
-        console.error("ABI：", JSON.stringify(abi, null, 2));
-        console.error("网络：", provider.network); // 输出网络信息
+        // 提取错误信息并显示给用户
+        let errorMessage = "获取游戏状态失败";
+        if (error.reason) {
+            // 如果是智能合约的错误信息
+            errorMessage = error.reason || "获取游戏状态失败，请检查您的钱包设置";
+        } else if (error.message) {
+            // 如果是其他类型的错误
+            errorMessage = error.message;
+        }
+        alert(errorMessage);
     }
 }
 
@@ -480,7 +509,7 @@ async function waitForTransaction(tx) {
         await tx.wait(); // 等待交易确认
         console.log("交易已确认！");
     } catch (error) {
-        console.error("���易确认失败：", error);
+        console.error("交易确认失败：", error);
     }
 }
 
@@ -489,8 +518,19 @@ async function endGame() {
         const tx = await gameContract.endGame();
         await waitForTransaction(tx);
         console.log("游戏结束，奖励已分配！");
+        alert("游戏结束，奖励已分配！");
     } catch (error) {
         console.error("结束游戏失败：", error);
+        // 提取错误信息并显示给用户
+        let errorMessage = "游戏结束失败";
+        if (error.reason) {
+            // 如果是智能合约的错误信息
+            errorMessage = error.reason || "游戏结束失败，请检查您的钱包设置";
+        } else if (error.message) {
+            // 如果是其他类型的错误
+            errorMessage = error.message;
+        }
+        alert(errorMessage);
     }
 }
 
@@ -499,6 +539,3 @@ async function endGame() {
 //     console.log("New Board:", newBoard);
 //     updateBoardView();
 // });
-
-// 检查 ethers 是否正确加载
-console.log("Ethers version:", ethers.version);

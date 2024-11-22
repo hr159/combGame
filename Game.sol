@@ -40,6 +40,8 @@ contract Game {
     }
 
     function startGame() public payable gameStarted gameNotEnded {
+        require(block.timestamp > startTime, "Game has not started yet");
+        require(block.timestamp < endTime, "Game has ended");
         require(msg.value >= entryFee, "Insufficient entry fee");
         require(players.length < 2, "Game is full");
         playerGames[msg.sender] = GameState(0, [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]);
@@ -47,7 +49,6 @@ contract Game {
     }
 
     function updateGame(uint256 score, uint8[4][4] memory board) public gameNotEnded {
-        require(playerGames[msg.sender].score == 0, "Game already updated");
         playerGames[msg.sender].score = score;
         playerGames[msg.sender].board = board;
         playerScores[msg.sender] = score;
@@ -80,5 +81,10 @@ contract Game {
     function withdraw() public onlyOwner {
         require(!gameActive, "Game is still active");
         payable(owner).transfer(address(this).balance);
+    }
+    
+        // Function to get current game state
+    function getGameState() public view returns (uint256, uint8[4][4] memory) {
+        return (playerGames[msg.sender].score, playerGames[msg.sender].board);
     }
 } 

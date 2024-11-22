@@ -1,5 +1,7 @@
 const config = {
-    contractAddress: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9", // 替换为您的合约地址
+	entryFee: "0.01", // 入场费金额（以 ETH 为单位）
+    moveCountThreshold: 10, // 添加步数阈值配置
+    contractAddress: "0xe1DA8919f262Ee86f9BE05059C9280142CF23f48", // 替换为您的合约地址
     abi: [
 		{
 			"inputs": [
@@ -70,6 +72,24 @@ const config = {
 					"internalType": "bool",
 					"name": "",
 					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getGameState",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint8[4][4]",
+					"name": "",
+					"type": "uint8[4][4]"
 				}
 			],
 			"stateMutability": "view",
@@ -190,8 +210,7 @@ const config = {
 			"stateMutability": "nonpayable",
 			"type": "function"
 		}
-	],
-    entryFee: "0.01" // 入场费金额（以 ETH 为单位）
+	]
 };
 
 export default config;
