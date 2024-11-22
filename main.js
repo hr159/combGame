@@ -51,7 +51,7 @@ async function newgame() {
 async function startGame() {
     console.log("startGame");
     try {
-        const entryFee = ethers.utils.parseEther("1"); // 将入场费写死为 1 ETH
+        const entryFee = ethers.parseEther("1"); // 将入场费写死为 1 ETH
         const tx = await gameContract.startGame({ value: entryFee });
         await waitForTransaction(tx);
         newgame(); // 初始化游戏
@@ -480,7 +480,7 @@ async function waitForTransaction(tx) {
         await tx.wait(); // 等待交易确认
         console.log("交易已确认！");
     } catch (error) {
-        console.error("交易确认失败：", error);
+        console.error("���易确认失败：", error);
     }
 }
 
@@ -499,3 +499,6 @@ async function endGame() {
 //     console.log("New Board:", newBoard);
 //     updateBoardView();
 // });
+
+// 检查 ethers 是否正确加载
+console.log("Ethers version:", ethers.version);
