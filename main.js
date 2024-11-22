@@ -5,7 +5,7 @@ import config from './config.js'; // 导入配置文件
 var board = new Array(); // 全局变量
 var hasConflicted = new Array();
 var score = 0;
-var isTransactionPending = false; // 用于跟踪交易状态
+// var isTransactionPending = false; // 用于跟踪交易状态
 
 // 智能合约地址和 ABI
 const contractAddress = config.contractAddress; // 使用配置文件中的合约地址
@@ -15,10 +15,9 @@ let provider;
 let signer;
 let gameContract;
 
-window.onload = function() {
-    // 页面加载时不再自动开始游戏
+window.onload = async function() {
+    await initEthereum();
 };
-
 
 // 初始化以太坊连接
 async function initEthereum() {
@@ -50,20 +49,14 @@ async function newgame() {
 
 // 开始游戏并上链
 async function startGame() {
-    if (isTransactionPending) {
-        alert("游戏启动中，请等待上链操作后开始游戏"); // 改为弹窗提示
-        return; // 如果有未完成的交易，阻止移动
-    }
     console.log("startGame");
     try {
-        isTransactionPending = true; // 标记交易开始
-        await initEthereum();
-        await gameContract.startGame(); // 调用智能合约的 startGame 函数
+        const entryFee = ethers.utils.parseEther("1"); // 将入场费写死为 1 ETH
+        const tx = await gameContract.startGame({ value: entryFee });
+        await waitForTransaction(tx);
         newgame(); // 初始化游戏
     } catch (error) {
         console.error("Error starting game on blockchain:", error);
-    } finally {
-        isTransactionPending = false; // 标记交易结束
     }
 }
 
@@ -162,7 +155,7 @@ async function updateGame() {
     console.log("棋盘状态：", JSON.stringify(boards, null, 2));
 
     try {
-        isTransactionPending = true; // 标记交易开始
+        // isTransactionPending = true;
         const tx = await gameContract.updateGame(score, boards);
         console.log("上链交易详情：", tx);
 
@@ -173,7 +166,7 @@ async function updateGame() {
     } catch (error) {
         console.error("数据上链失败：", error);
     } finally {
-        isTransactionPending = false; // 标记交易结束
+        // isTransactionPending = false;
     }
 }
 
@@ -189,6 +182,9 @@ async function getGameState() {
         return [score, board];
     } catch (error) {
         console.error("获取链上游戏状态失败：", error);
+        console.error("合约地址：", contractAddress);
+        console.error("ABI：", JSON.stringify(abi, null, 2));
+        console.error("网络：", provider.network); // 输出网络信息
         return null;
     }
 }
@@ -230,10 +226,10 @@ document.getElementById('newgamebutton').addEventListener('click', async functio
 
 // 键盘事件监听
 $(document).keydown(async function (event) {
-    if (isTransactionPending) {
-        alert("操作进行中，请等待上链后再操作"); // 改为弹窗提示
-        return; // 如果有未完成的交易，阻止移动
-    }
+    // if (isTransactionPending) {
+    //     alert("操作进行中，请等待上链后再操作"); // 改为弹窗提示
+    //     return; // 如果有未完成的交易，阻止移动
+    // }
 
     switch (event.keyCode) {
         case 37://left
@@ -487,3 +483,19 @@ async function waitForTransaction(tx) {
         console.error("交易确认失败：", error);
     }
 }
+
+async function endGame() {
+    try {
+        const tx = await gameContract.endGame();
+        await waitForTransaction(tx);
+        console.log("游戏结束，奖励已分配！");
+    } catch (error) {
+        console.error("结束游戏失败：", error);
+    }
+}
+
+// gameContract.on("MoveExecuted", (player, direction, newScore, newBoard) => {
+//     console.log(`Player: ${player}, Direction: ${direction}, New Score: ${newScore}`);
+//     console.log("New Board:", newBoard);
+//     updateBoardView();
+// });
