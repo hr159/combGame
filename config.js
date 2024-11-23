@@ -1,69 +1,216 @@
 const config = {
-    contractAddress: "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720", // 替换为您的合约地址
+	entryFee: "0.01", // 入场费金额（以 ETH 为单位）
+    moveCountThreshold: 10, // 添加步数阈值配置
+    contractAddress: "0xe1DA8919f262Ee86f9BE05059C9280142CF23f48", // 替换为您的合约地址
     abi: [
-                 {
-                     "type": "function",
-                     "name": "getGameState",
-                     "inputs": [],
-                     "outputs": [
-                         {
-                             "name": "",
-                             "type": "uint256",
-                             "internalType": "uint256"
-                         },
-                         {
-                             "name": "",
-                             "type": "uint8[4][4]",
-                             "internalType": "uint8[4][4]"
-                         }
-                     ],
-                     "stateMutability": "view"
-                 },
-                 {
-                     "type": "function",
-                     "name": "playerGames",
-                     "inputs": [
-                         {
-                             "name": "",
-                             "type": "address",
-                             "internalType": "address"
-                         }
-                     ],
-                     "outputs": [
-                         {
-                             "name": "score",
-                             "type": "uint256",
-                             "internalType": "uint256"
-                         }
-                     ],
-                     "stateMutability": "view"
-                 },
-                 {
-                     "type": "function",
-                     "name": "startGame",
-                     "inputs": [],
-                     "outputs": [],
-                     "stateMutability": "nonpayable"
-                 },
-                 {
-                     "type": "function",
-                     "name": "updateGame",
-                     "inputs": [
-                         {
-                             "name": "score",
-                             "type": "uint256",
-                             "internalType": "uint256"
-                         },
-                         {
-                             "name": "board",
-                             "type": "uint8[4][4]",
-                             "internalType": "uint8[4][4]"
-                         }
-                     ],
-                     "outputs": [],
-                     "stateMutability": "nonpayable"
-                 }
-             ]
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_entryFee",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_startTime",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_endTime",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		},
+		{
+			"inputs": [],
+			"name": "cancelGame",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "endGame",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "endTime",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "entryFee",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "gameActive",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getGameState",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint8[4][4]",
+					"name": "",
+					"type": "uint8[4][4]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "owner",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"name": "playerGames",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "score",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"name": "playerScores",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "players",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "startGame",
+			"outputs": [],
+			"stateMutability": "payable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "startTime",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "score",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint8[4][4]",
+					"name": "board",
+					"type": "uint8[4][4]"
+				}
+			],
+			"name": "updateGame",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "withdraw",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}
+	]
 };
 
 export default config;
