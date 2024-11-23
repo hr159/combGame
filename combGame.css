@@ -38,7 +38,7 @@
     margin: 20px auto;
 }
 #main{
-    background-image: url("static/bg.png");
+    background-image: url("static/bg1.jpg");
     background-position: center center;
     background-size: cover;
     height: 100vh;
@@ -47,10 +47,9 @@
 #grid-container {
     width: 500px;
     height: 500px;
-
-    margin: 50px auto;
+    left: 0px;
+    top:-175px;
     background-color: #bbada0;
-
     border-radius: 10px;
     position: relative;
 }
@@ -121,4 +120,27 @@
 
 #restartgamebutton:hover {
     background-color: #9f8b77;
+}
+
+.footer {
+    width:70%;
+    position: relative;
+    top: -175px;
+    display: flex;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+}
+.footer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.footer-item img {
+  width: 50px; /* Adjust the image size as needed */
+  height: auto;
+}
+.footer-item p {
+  margin-top: 10px;
+   color: white;
+  text-align: center;
 }

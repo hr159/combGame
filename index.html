@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>CombGame</title>
+    <title>ドラゴンボール upgrade game</title>
     <link rel="stylesheet" type="text/css" href="combGame.css">
     <script type="text/javascript" src="jquery-1.11.0.js"></script>
     <script type="text/javascript" src="support.js"></script>
@@ -12,13 +12,12 @@
 <body>
 <div id="main">
     <div id="head">
-        <h1>CombGame</h1>
-        <a href="#" id="newgamebutton">New Game</a>
+        <h1>ドラゴンボール upgrade</h1>
+        <a href="#" id="newgamebutton" onclick="music()">New Game</a>
         <a href="#" id="checkstatebutton">Check Game State</a>
 
         <p style="color:red">score: <span id="score">0</span></p>
     </div>
-
     <div id="grid-container">
         <div class="grid-cell" id="grid-cell-0-0"></div>
         <div class="grid-cell" id="grid-cell-0-1"></div>
@@ -40,11 +39,66 @@
         <div class="grid-cell" id="grid-cell-3-2"></div>
         <div class="grid-cell" id="grid-cell-3-3"></div>
     </div>
+    <audio id="bgMusic" src="music/1.mp3" autoplay></audio>
+    <div class="footer">
+        <div class="footer-item">
+            <img src="static/1.jpg" alt="Image 1">
+            <p>小悟空</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/2.jpg" alt="Image 2">
+            <p>青年悟空</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/3.jpg" alt="Image 3">
+            <p>界王拳悟空</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/4.jpg" alt="Image 4">
+            <p>超1</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/5.jpg" alt="Image 5">
+            <p>超2</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/6.jpg" alt="Image 6">
+            <p>超3</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/7.jpg" alt="Image 7">
+            <p>超4</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/8.jpg" alt="Image 8">
+            <p>超5</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/9.jpg" alt="Image 9">
+            <p>超蓝</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/10.jpg" alt="Image 10">
+            <p>超红</p>
+        </div>
+        <div class="footer-item">
+            <img src="static/11.jpg" alt="Image 10">
+            <p>自在极意功</p>
+        </div>
+    </div>
 </div>
-<!-- <audio id="moveSound" src="static/moveSound.mp3" preload="auto"></audio>
-<audio id="mergeSound" src="static/mergeSound.mp3" preload="auto"></audio> -->
+<!--<audio id="moveSound" src="static/moveSound.mp3" preload="auto"></audio>-->
+<!--<audio id="mergeSound" src="static/mergeSound.mp3" preload="auto"></audio>-->
 <script type="module">
     import './main.js'; // 确保 main.js 在其他脚本之前加载
+</script>
+<script>
+
+    function music(){
+        var audio = document.getElementById("bgMusic");
+        audio.play();
+    }
+
 </script>
 </body>
 </html>
