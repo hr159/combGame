@@ -8,7 +8,6 @@ contract Game {
     }
 
     mapping(address => GameState) public playerGames;
-    mapping(address => uint256) public playerScores;
     address[] public players;
     address public owner;
     uint256 public entryFee;
@@ -40,18 +39,43 @@ contract Game {
     }
 
     function startGame() public payable gameStarted gameNotEnded {
-        require(block.timestamp > startTime, "Game has not started yet");
-        require(block.timestamp < endTime, "Game has ended");
         require(msg.value >= entryFee, "Insufficient entry fee");
         require(players.length < 2, "Game is full");
-        playerGames[msg.sender] = GameState(0, [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]);
-        players.push(msg.sender);
+        
+        // 退还多余的费用
+        uint256 excess = msg.value - entryFee;
+        if (excess > 0) {
+            payable(msg.sender).transfer(excess);
+        }
+        
+        // 保留现有积分，只重置棋盘
+        uint256 currentScore = playerGames[msg.sender].score;
+        playerGames[msg.sender] = GameState(
+            currentScore, 
+            [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        );
+        
+        // 检查玩家是否已在players数组中
+        bool playerExists = false;
+        for (uint256 i = 0; i < players.length; i++) {
+            if (players[i] == msg.sender) {
+                playerExists = true;
+                break;
+            }
+        }
+        
+        // 只有当玩家不在数组中时才添加
+        if (!playerExists) {
+            players.push(msg.sender);
+        }
     }
 
     function updateGame(uint256 score, uint8[4][4] memory board) public gameNotEnded {
-        playerGames[msg.sender].score = score;
+        uint256 currentScore = playerGames[msg.sender].score;
+        if (currentScore < score) {
+            playerGames[msg.sender].score = score;
+        }
         playerGames[msg.sender].board = board;
-        playerScores[msg.sender] = score;
     }
 
     function endGame() public onlyOwner {
@@ -62,8 +86,18 @@ contract Game {
 
     function distributeRewards() internal {
         require(players.length == 2, "Not enough players");
-        address winner = playerScores[players[0]] > playerScores[players[1]] ? players[0] : players[1];
-        payable(winner).transfer(address(this).balance);
+        uint256 score1 = playerGames[players[0]].score;
+        uint256 score2 = playerGames[players[1]].score;
+        
+        if (score1 == score2) {
+            // 平局情况下平分奖励
+            uint256 splitAmount = address(this).balance / 2;
+            payable(players[0]).transfer(splitAmount);
+            payable(players[1]).transfer(splitAmount);
+        } else {
+            address winner = score1 > score2 ? players[0] : players[1];
+            payable(winner).transfer(address(this).balance);
+        }
     }
 
     function cancelGame() public onlyOwner {

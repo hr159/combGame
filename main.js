@@ -283,7 +283,9 @@ $(document).keydown(async function (event) {
         console.log("移动次数：", moveCount);
         
         setTimeout(generateOneNumber, 210);
-        setTimeout(isgameover, 300);
+        setTimeout(async () => {
+            await isgameover();
+        }, 300);
 
         // 使用配置中的步数阈值
         if (moveCount >= config.moveCountThreshold) {
@@ -458,19 +460,52 @@ function moveDown() {
     return true;
 }
 
-function isgameover() {
-    if (nospace(board) && nomove(board)) {
-        gameover();
+async function gameover() {
+    try {
+        // 先上传最终分数
+        isUploading = true;
+        const tx = await updateGame(); // 确保最终状态上传到链上
+        
+        // 调用合约的结束游戏函数
+        // const tx = await gameContract.endGame();
+        await waitForTransaction(tx);
+        
+        console.log("游戏结束，最终分数已上链！");
+        
+        // 显示游戏结束界面
+        $("#grid-container").append(
+            "<div id='gameover' class='gameover'>" +
+            "<p>本次得分</p>" +
+            "<span>" + score + "</span>" +
+            "<p>分数已上链</p>" +
+            "<a href='javascript:restartgame();' id='restartgamebutton'>重新开始</a>" +
+            "</div>"
+        );
+        
+        var gameover = $("#gameover");
+        gameover.css("width", "500px");
+        gameover.css("height", "500px");
+        gameover.css("background-color", "rgba(0, 0, 0, 0.5)");
+        
+    } catch (error) {
+        console.error("游戏结束上链失败：", error);
+        let errorMessage = "游戏结束上链失败";
+        if (error.reason) {
+            errorMessage = error.reason;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        alert(errorMessage);
+    } finally {
+        isUploading = false;
     }
 }
 
-function gameover() {
-    alert("gameover!");
-    $("#grid-container").append("<div id='gameover' class='gameover'><p>本次得分</p><span>" + score + "</span><a href='javascript:restartgame();' id='restartgamebutton'>Restart</a></div>");
-    var gameover = $("#gameover");
-    gameover.css("width", "500px");
-    gameover.css("height", "500px");
-    gameover.css("background-color", "rgba(0, 0, 0, 0.5)");
+// 修改 isgameover 函数为异步函数
+async function isgameover() {
+    if (nospace(board) && nomove(board)) {
+        await gameover();
+    }
 }
 
 // 查询链上游戏状态
