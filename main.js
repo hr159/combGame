@@ -17,6 +17,7 @@ let gameContract;
 
 window.onload = async function() {
     await initEthereum();
+    await getGameTime(); // 获取游戏时间
 };
 
 // 初始化以太坊连接
@@ -29,6 +30,9 @@ async function initEthereum() {
         // 检查网络
         const network = await provider.getNetwork();
         console.log("Connected to network:", network);
+        
+        // 初始化完成后获取游戏时间
+        await getGameTime();
     } else {
         alert("请安装 MetaMask!");
     }
@@ -210,7 +214,7 @@ async function getGameState() {
 // 计算当前游戏得分
 function calculateScore() {
     // 直接返回全局变量 score
-    // 因为在移动和合并数字的过程中，score 已经被更新了
+    // 因为在移动和��并数字的过程中，score 已经被更新了
     return score;
 }
 
@@ -239,7 +243,7 @@ function getBoard() {
 
 document.getElementById('newgamebutton').addEventListener('click', async function(event) {
     event.preventDefault();
-    await startGame(); // 点击按钮时调用 startGame
+    await startGame(); // 点击按钮时调 startGame
 });
 // 添加计步器
 var moveCount = 0;
@@ -489,7 +493,7 @@ async function gameover() {
         
     } catch (error) {
         console.error("游戏结束上链失败：", error);
-        let errorMessage = "游戏结束上链失败";
+        let errorMessage = "游戏结束上链失";
         if (error.reason) {
             errorMessage = error.reason;
         } else if (error.message) {
@@ -574,3 +578,28 @@ async function endGame() {
 //     console.log("New Board:", newBoard);
 //     updateBoardView();
 // });
+
+// 添加获取游戏时间的函数
+async function getGameTime() {
+    try {
+        // 直接使用已初始化的 gameContract
+        const [startTime, endTime, currentTime, isActive] = await gameContract.getGameTimes();
+
+        if (startTime && endTime) {
+            // 转换时间戳为可读格式
+            const startDate = new Date(Number(startTime) * 1000).toLocaleString();
+            const endDate = new Date(Number(endTime) * 1000).toLocaleString();
+
+            // 更新 DOM
+            document.getElementById('startTime').textContent = startDate;
+            document.getElementById('endTime').textContent = endDate;
+            document.getElementById('gameTime').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('获取游戏时间失败:', error);
+        document.getElementById('gameTime').style.display = 'none';
+    }
+}
+
+// 页面加载时获取时间
+window.addEventListener('load', getGameTime);

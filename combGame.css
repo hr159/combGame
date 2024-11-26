@@ -42,13 +42,15 @@
     background-position: center center;
     background-size: cover;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 #grid-container {
     width: 500px;
     height: 500px;
-    left: 0px;
-    top:-175px;
+    margin: 0 auto;
     background-color: #bbada0;
     border-radius: 10px;
     position: relative;
@@ -123,10 +125,10 @@
 }
 
 .footer {
-    width:70%;
-    position: relative;
-    top: -175px;
+    width: 70%;
+    margin: 20px auto;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     font-family: Arial, sans-serif;
 }

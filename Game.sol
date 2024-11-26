@@ -84,6 +84,9 @@ contract Game {
         distributeRewards();
     }
 
+    event RewardDistributed(address indexed winner, uint256 amount);
+    event TransferFailed(address indexed recipient);
+
     function distributeRewards() internal {
         require(players.length == 2, "Not enough players");
         uint256 score1 = playerGames[players[0]].score;
@@ -92,11 +95,19 @@ contract Game {
         if (score1 == score2) {
             // 平局情况下平分奖励
             uint256 splitAmount = address(this).balance / 2;
-            payable(players[0]).transfer(splitAmount);
-            payable(players[1]).transfer(splitAmount);
+            (bool success1, ) = payable(players[0]).call{value: splitAmount}("");
+            if (!success1) emit TransferFailed(players[0]);
+            else emit RewardDistributed(players[0], splitAmount);
+            
+            (bool success2, ) = payable(players[1]).call{value: splitAmount}("");
+            if (!success2) emit TransferFailed(players[1]);
+            else emit RewardDistributed(players[1], splitAmount);
         } else {
             address winner = score1 > score2 ? players[0] : players[1];
-            payable(winner).transfer(address(this).balance);
+            uint256 amount = address(this).balance;
+            (bool success, ) = payable(winner).call{value: amount}("");
+            if (!success) emit TransferFailed(winner);
+            else emit RewardDistributed(winner, amount);
         }
     }
 
@@ -121,4 +132,26 @@ contract Game {
     function getGameState() public view returns (uint256, uint8[4][4] memory) {
         return (playerGames[msg.sender].score, playerGames[msg.sender].board);
     }
+
+        // 根据地址查询游戏状态
+    function getGameStateByAddress(address player) public view returns (uint256, uint8[4][4] memory) {
+        return (playerGames[player].score, playerGames[player].board);
+    }
+
+    // 添加视图函数查询游戏时间
+    function getGameTimes() public view returns (
+        uint256 _startTime,
+        uint256 _endTime,
+        uint256 _currentTime,
+        bool _isActive
+    ) {
+        return (
+            startTime,
+            endTime,
+            block.timestamp,
+            gameActive
+        );
+    }
+
+
 } 

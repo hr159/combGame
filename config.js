@@ -1,7 +1,7 @@
 const config = {
-	entryFee: "0.01", // 入场费金额（以 ETH 为单位）
-    moveCountThreshold: 1000, // 添加步数阈值配置
-    contractAddress: "0x8ce361602B935680E8DeC218b820ff5056BeB7af", // 替换为您的合约地址
+	entryFee: "1", // 入场费金额（以 ETH 为单位）
+    moveCountThreshold: 500, // 添加步数阈值配置
+    contractAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // 替换为您的合约地址
     abi: [
 		{
 			"inputs": [
@@ -23,6 +23,38 @@ const config = {
 			],
 			"stateMutability": "nonpayable",
 			"type": "constructor"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "winner",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "amount",
+					"type": "uint256"
+				}
+			],
+			"name": "RewardDistributed",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "recipient",
+					"type": "address"
+				}
+			],
+			"name": "TransferFailed",
+			"type": "event"
 		},
 		{
 			"inputs": [],
@@ -90,6 +122,58 @@ const config = {
 					"internalType": "uint8[4][4]",
 					"name": "",
 					"type": "uint8[4][4]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "player",
+					"type": "address"
+				}
+			],
+			"name": "getGameStateByAddress",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint8[4][4]",
+					"name": "",
+					"type": "uint8[4][4]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getGameTimes",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "_startTime",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_endTime",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_currentTime",
+					"type": "uint256"
+				},
+				{
+					"internalType": "bool",
+					"name": "_isActive",
+					"type": "bool"
 				}
 			],
 			"stateMutability": "view",
