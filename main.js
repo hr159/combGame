@@ -468,11 +468,11 @@ async function gameover() {
     try {
         // 先上传最终分数
         isUploading = true;
-        const tx = await updateGame(); // 确保最终状态上传到链上
+        await updateGame(); // 确保最终状态上传到链上
         
         // 调用合约的结束游戏函数
         // const tx = await gameContract.endGame();
-        await waitForTransaction(tx);
+        // await waitForTransaction(tx);
         
         console.log("游戏结束，最终分数已上链！");
         

@@ -62,6 +62,8 @@ MyGameProject/
 ### 启动本地测试链
 使用以下命令启动 Anvil（Foundry 的本地测试链）：
 anvil
+在启动 Anvil 后，您可以使用 --accounts 参数来指定要创建的账户数量。例如，如果您想创建 10 个账户，可以使用以下命令：
+anvil --accounts 10
 启动后，Anvil 将显示：
 - 可用的测试账户及其私钥
 - RPC 端点（默认为 http://127.0.0.1:8545）
