@@ -58,15 +58,24 @@ MyGameProject/
 ### 启动本地测试链
 使用以下命令启动 Anvil（Foundry 的本地测试链）：
 anvil
-在启动 Anvil 后，您可以使用 --accounts 参数来指定要创建的账户数量。例如，如果您想创建 10 个账户，可以使用以下命令：
-anvil --accounts 10
+#在启动 Anvil 后，您可以使用 --accounts 参数来指定要创建的账户数量。例如，如果您想创建 10 个账户，可以使用以下命令：
+#anvil --accounts 10
+
 启动后，Anvil 将显示：
 - 可用的测试账户及其私钥
 - RPC 端点（默认为 http://127.0.0.1:8545）
 - Chain ID（默认为 31337）
 
 
-### 5. 运行部署脚本
+### 5. 使用remix运行部署脚本或本地部署
+remix 连接到本地链
+remix 选择环境为 Custom RPC
+remix 选择 RPC URL 为 http://127.0.0.1:8545
+remix 选择 Chain ID 为 31337    
+build 编译
+deploy 部署
+
+本地部署
 在项目根目录下，运行以下命令以部署智能合约：
  forge create --rpc-url  127.0.0.1:8545 --private-key 私钥 src/Game.sol:Game --constructor-args-path constructorArgs.json
 ##constructorArgs.json为配置文件
@@ -85,3 +94,10 @@ anvil --accounts 10
 ## 其他说明
 - 请确保您已安装 MetaMask，并连接到正确的以太坊网络。
 - 在 `main.js` 中，您需要更新智能合约地址和 ABI，以便与合约进行交互。
+
+
+### 7. 修改config.js
+修改合约地址和入场费以及上链步数设置
+
+### 8. 运行游戏
+运行index.html
