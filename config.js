@@ -1,5 +1,5 @@
 const config = {
-	entryFee: "1000", // 入场费金额（以 ETH 为单位）
+	entryFee: "0.0001", // 入场费金额（以 ETH 为单位）
     moveCountThreshold: 50, // 添加步数阈值配置
     contractAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // 替换为您的合约地址
     abi: [

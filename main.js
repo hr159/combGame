@@ -76,9 +76,13 @@ async function startGame() {
 
 function restartgame() {
     $("#gameover").remove();
+    moveCount = 0;
     updateScore(0);
     newgame();
 }
+
+// 将函数暴露到全局作用域
+window.restartgame = restartgame;
 
 function init() {
     for (var i = 0; i < 4; i++) {
@@ -214,7 +218,7 @@ async function getGameState() {
 // 计算当前游戏得分
 function calculateScore() {
     // 直接返回全局变量 score
-    // 因为在移动和��并数字的过程中，score 已经被更新了
+    // 因为在移动和并数字的过程中，score 已经被更新了
     return score;
 }
 
