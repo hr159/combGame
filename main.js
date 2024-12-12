@@ -202,7 +202,7 @@ async function getGameState() {
         console.log("正在从链上获取游戏状态...");
         const [score, board] = await gameContract.getGameState();
         console.log("链上游戏状态：");
-        console.log("分��：", score.toString());
+        console.log("分数：", score.toString());
         console.log("棋盘：", JSON.stringify(board, null, 2));
         // 更新前端显示...
         return [score, board];
@@ -245,10 +245,16 @@ function getBoard() {
     return currentBoard;
 }
 
-// document.getElementById('newgamebutton').addEventListener('click', async function(event) {
-//     event.preventDefault();
-//     await startGame(); // 点击按钮时调 startGame
-// });
+document.getElementById('newgamebutton').addEventListener('click', async function(event) {
+    event.preventDefault();
+    await startGame(); // 点击按钮时调 startGame
+});
+// 事件监听器
+document.getElementById('checkboardbutton').addEventListener('click', async function(event) {
+    event.preventDefault();
+    await queryBoard(); // 点击按钮时调用 queryBoard
+});
+
 // 添加计步器
 var moveCount = 0;
 var isUploading = false;
@@ -540,11 +546,7 @@ async function checkGameState() {
     }
 }
 
-// 事件监听器
-document.getElementById('checkstatebutton').addEventListener('click', async function(event) {
-    event.preventDefault();
-    await checkGameState(); // 点击按钮时调用 checkGameState
-});
+
 
 async function waitForTransaction(tx) {
     try {
@@ -590,7 +592,7 @@ async function getGameTime() {
         const [startTime, endTime, currentTime, isActive] = await gameContract.getGameTimes();
 
         if (startTime && endTime) {
-            // 转换时间戳为可读格式
+            // 转换时间戳为可���格式
             const startDate = new Date(Number(startTime) * 1000).toLocaleString();
             const endDate = new Date(Number(endTime) * 1000).toLocaleString();
 
@@ -614,10 +616,10 @@ async function queryBoard() {
         const [score, board] = await gameContract.getGameState();
         console.log("链上棋盘状态：");
         console.log("分数：", score.toString());
-        console.log("棋盘：", JSON.stringify(board, null, 2));
+        console.log("棋盘：", JSON.stringify(board.map(row => row.map(cell => cell.toString()))));
         
         // 在左边展示棋盘数据
-        displayBoardData(score, board);
+        displayBoardData(score.toString(), board.map(row => row.map(cell => cell.toString())));
     } catch (error) {
         console.error("获取棋盘记录失败：", error);
         alert("获取棋盘记录失败，请检查您的钱包设置");
@@ -635,7 +637,8 @@ function displayBoardData(score, board) {
     for (let i = 0; i < 4; i++) {
         boardHtml += "<div class='row'>";
         for (let j = 0; j < 4; j++) {
-            boardHtml += `<div class='cell'>${board[i][j] !== 0 ? board[i][j] : ''}</div>`;
+            // 使用空格分隔数字
+            boardHtml += `${board[i][j] !== 0 ? board[i][j] : ''} `;
         }
         boardHtml += "</div>";
     }
@@ -653,9 +656,3 @@ function restoreBoard(board) {
     }
     updateBoardView(); // 更新游戏界面
 }
-
-// 事件监听器
-document.getElementById('checkboardbutton').addEventListener('click', async function(event) {
-    event.preventDefault();
-    await queryBoard(); // 点击按钮时调用 queryBoard
-});
