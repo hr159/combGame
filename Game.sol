@@ -40,8 +40,22 @@ contract Game {
 
     function startGame() public payable gameStarted gameNotEnded {
         require(msg.value >= entryFee, "Insufficient entry fee");
-        require(players.length < 2, "Game is full");
         
+        // 检查玩家是否已在players数组中
+        bool playerExists = false;
+        for (uint256 i = 0; i < players.length; i++) {
+            if (players[i] == msg.sender) {
+                playerExists = true;
+                break;
+            }
+        }
+
+        // 如果玩家不在数组中，检查游戏是否已满
+        if (!playerExists) {
+            require(players.length < 2, "Game is full");
+            players.push(msg.sender); // 添加新玩家
+        }
+
         // 退还多余的费用
         uint256 excess = msg.value - entryFee;
         if (excess > 0) {
@@ -54,20 +68,6 @@ contract Game {
             currentScore, 
             [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
         );
-        
-        // 检查玩家是否已在players数组中
-        bool playerExists = false;
-        for (uint256 i = 0; i < players.length; i++) {
-            if (players[i] == msg.sender) {
-                playerExists = true;
-                break;
-            }
-        }
-        
-        // 只有当玩家不在数组中时才添加
-        if (!playerExists) {
-            players.push(msg.sender);
-        }
     }
 
     function updateGame(uint256 score, uint8[4][4] memory board) public gameNotEnded {
