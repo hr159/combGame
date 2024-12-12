@@ -1,7 +1,7 @@
 const config = {
 	entryFee: "0.0001", // 入场费金额（以 ETH 为单位）
-    moveCountThreshold: 50, // 添加步数阈值配置
-    contractAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // 替换为您的合约地址
+    moveCountThreshold: 25, // 添加步数阈值配置
+    contractAddress: "0x700b6A60ce7EaaEA56F065753d8dcB9653dbAD35", // 替换为您的合约地址
     abi: [
 		{
 			"inputs": [
@@ -9,7 +9,7 @@ const config = {
 					"internalType": "uint256",
 					"name": "_entryFee",
 					"type": "uint256"
-				},
+				}, 
 				{
 					"internalType": "uint256",
 					"name": "_startTime",

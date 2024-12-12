@@ -202,7 +202,7 @@ async function getGameState() {
         console.log("正在从链上获取游戏状态...");
         const [score, board] = await gameContract.getGameState();
         console.log("链上游戏状态：");
-        console.log("分数：", score.toString());
+        console.log("分��：", score.toString());
         console.log("棋盘：", JSON.stringify(board, null, 2));
         // 更新前端显示...
         return [score, board];
@@ -245,10 +245,10 @@ function getBoard() {
     return currentBoard;
 }
 
-document.getElementById('newgamebutton').addEventListener('click', async function(event) {
-    event.preventDefault();
-    await startGame(); // 点击按钮时调 startGame
-});
+// document.getElementById('newgamebutton').addEventListener('click', async function(event) {
+//     event.preventDefault();
+//     await startGame(); // 点击按钮时调 startGame
+// });
 // 添加计步器
 var moveCount = 0;
 var isUploading = false;
@@ -607,3 +607,55 @@ async function getGameTime() {
 
 // 页面加载时获取时间
 window.addEventListener('load', getGameTime);
+
+// 查询棋盘记录
+async function queryBoard() {
+    try {
+        const [score, board] = await gameContract.getGameState();
+        console.log("链上棋盘状态：");
+        console.log("分数：", score.toString());
+        console.log("棋盘：", JSON.stringify(board, null, 2));
+        
+        // 在左边展示棋盘数据
+        displayBoardData(score, board);
+    } catch (error) {
+        console.error("获取棋盘记录失败：", error);
+        alert("获取棋盘记录失败，请检查您的钱包设置");
+    }
+}
+
+// 显示棋盘数据
+function displayBoardData(score, board) {
+    // 清空之前的棋盘数据
+    const boardDisplay = document.getElementById('boardDisplay');
+    boardDisplay.innerHTML = `<p>分数：${score}</p>`;
+    
+    // 创建棋盘的HTML结构
+    let boardHtml = "<div class='board'>";
+    for (let i = 0; i < 4; i++) {
+        boardHtml += "<div class='row'>";
+        for (let j = 0; j < 4; j++) {
+            boardHtml += `<div class='cell'>${board[i][j] !== 0 ? board[i][j] : ''}</div>`;
+        }
+        boardHtml += "</div>";
+    }
+    boardHtml += "</div>";
+    
+    boardDisplay.innerHTML += boardHtml;
+}
+
+// 恢复棋盘状态
+function restoreBoard(board) {
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            board[i][j] = board[i][j];
+        }
+    }
+    updateBoardView(); // 更新游戏界面
+}
+
+// 事件监听器
+document.getElementById('checkboardbutton').addEventListener('click', async function(event) {
+    event.preventDefault();
+    await queryBoard(); // 点击按钮时调用 queryBoard
+});
